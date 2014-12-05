@@ -1,0 +1,40 @@
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Debug\Philips Lighting Luminaries Choicesheet.exe
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Debug\Philips Lighting Luminaries Choicesheet.pdb
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\ResolveAssemblyReference.cache
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips_Lighting_Luminaries_Choicesheet.Form1.resources
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips_Lighting_Luminaries_Choicesheet.Properties.Resources.resources
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.csproj.GenerateResource.Cache
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.exe
+D:\我的文档\Visual Studio 2005\Projects\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.pdb
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.exe
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.pdb
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Debug\Philips Lighting Luminaries Choicesheet.exe
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Debug\Philips Lighting Luminaries Choicesheet.pdb
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\ResolveAssemblyReference.cache
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips_Lighting_Luminaries_Choicesheet.Form1.resources
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips_Lighting_Luminaries_Choicesheet.Properties.Resources.resources
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.csproj.GenerateResource.Cache
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Release\Philips Lighting Luminaries Choicesheet.exe
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Release\Philips Lighting Luminaries Choicesheet.pdb
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\ResolveAssemblyReference.cache
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips_Lighting_Luminaries_Choicesheet.Form1.resources
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips_Lighting_Luminaries_Choicesheet.Properties.Resources.resources
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips Lighting Luminaries Choicesheet.csproj.GenerateResource.Cache
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips Lighting Luminaries Choicesheet.exe
+G:\philips\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips Lighting Luminaries Choicesheet.pdb
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips Lighting Luminaries Choicesheet.exe
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips Lighting Luminaries Choicesheet.pdb
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.exe
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.pdb
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Debug\Philips Lighting Luminaries Choicesheet.exe
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Debug\Philips Lighting Luminaries Choicesheet.pdb
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\ResolveAssemblyReference.cache
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips_Lighting_Luminaries_Choicesheet.Form1.resources
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips_Lighting_Luminaries_Choicesheet.Properties.Resources.resources
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Debug\Philips Lighting Luminaries Choicesheet.csproj.GenerateResource.Cache
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Release\Philips Lighting Luminaries Choicesheet.exe
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\bin\Release\Philips Lighting Luminaries Choicesheet.pdb
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\ResolveAssemblyReference.cache
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips_Lighting_Luminaries_Choicesheet.Form1.resources
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips_Lighting_Luminaries_Choicesheet.Properties.Resources.resources
+D:\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\Release\Philips Lighting Luminaries Choicesheet.csproj.GenerateResource.Cache
