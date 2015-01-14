@@ -29,169 +29,169 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.btn12NC = new System.Windows.Forms.Button();
-            this.btnNaming = new System.Windows.Forms.Button();
-            this.txt12NC = new System.Windows.Forms.TextBox();
-            this.txtNaming = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.gbSearch = new System.Windows.Forms.GroupBox();
+            this.SearchNumber = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.SelectItems = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.btnDelete = new System.Windows.Forms.Button();
+            this.btnInverseAll = new System.Windows.Forms.Button();
+            this.btnSelectAll = new System.Windows.Forms.Button();
+            this.btnExport = new System.Windows.Forms.Button();
             this.dgvProduct = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.rbOutdoor = new System.Windows.Forms.RadioButton();
-            this.rbIndoor = new System.Windows.Forms.RadioButton();
+            this.btnAdd = new System.Windows.Forms.Button();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.buttonImport = new System.Windows.Forms.Button();
             this.gbSearch.SuspendLayout();
             this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvProduct)).BeginInit();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(113, 33);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Search by 12NC";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(540, 33);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(128, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Search by Prisma Naming";
-            // 
-            // btn12NC
-            // 
-            this.btn12NC.AutoSize = true;
-            this.btn12NC.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btn12NC.BackgroundImage")));
-            this.btn12NC.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btn12NC.Location = new System.Drawing.Point(265, 63);
-            this.btn12NC.Name = "btn12NC";
-            this.btn12NC.Size = new System.Drawing.Size(32, 34);
-            this.btn12NC.TabIndex = 2;
-            this.btn12NC.UseVisualStyleBackColor = true;
-            this.btn12NC.Click += new System.EventHandler(this.btn12NC_Click);
-            // 
-            // btnNaming
-            // 
-            this.btnNaming.AutoSize = true;
-            this.btnNaming.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("btnNaming.BackgroundImage")));
-            this.btnNaming.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.btnNaming.Location = new System.Drawing.Point(694, 63);
-            this.btnNaming.Name = "btnNaming";
-            this.btnNaming.Size = new System.Drawing.Size(32, 34);
-            this.btnNaming.TabIndex = 3;
-            this.btnNaming.UseVisualStyleBackColor = true;
-            this.btnNaming.Click += new System.EventHandler(this.btnNaming_Click);
-            // 
-            // txt12NC
-            // 
-            this.txt12NC.Location = new System.Drawing.Point(113, 69);
-            this.txt12NC.Name = "txt12NC";
-            this.txt12NC.Size = new System.Drawing.Size(146, 20);
-            this.txt12NC.TabIndex = 4;
-            // 
-            // txtNaming
-            // 
-            this.txtNaming.Location = new System.Drawing.Point(542, 69);
-            this.txtNaming.Name = "txtNaming";
-            this.txtNaming.Size = new System.Drawing.Size(146, 20);
-            this.txtNaming.TabIndex = 5;
             // 
             // gbSearch
             // 
-            this.gbSearch.Controls.Add(this.label2);
-            this.gbSearch.Controls.Add(this.txtNaming);
-            this.gbSearch.Controls.Add(this.label1);
-            this.gbSearch.Controls.Add(this.txt12NC);
-            this.gbSearch.Controls.Add(this.btn12NC);
-            this.gbSearch.Controls.Add(this.btnNaming);
-            this.gbSearch.Location = new System.Drawing.Point(12, 13);
+            this.gbSearch.Controls.Add(this.SearchNumber);
+            this.gbSearch.Controls.Add(this.button1);
+            this.gbSearch.Controls.Add(this.SelectItems);
+            this.gbSearch.Location = new System.Drawing.Point(16, 16);
+            this.gbSearch.Margin = new System.Windows.Forms.Padding(4);
             this.gbSearch.Name = "gbSearch";
-            this.gbSearch.Size = new System.Drawing.Size(833, 128);
+            this.gbSearch.Padding = new System.Windows.Forms.Padding(4);
+            this.gbSearch.Size = new System.Drawing.Size(1111, 157);
             this.gbSearch.TabIndex = 6;
             this.gbSearch.TabStop = false;
             this.gbSearch.Text = "Search";
             // 
+            // SearchNumber
+            // 
+            this.SearchNumber.Location = new System.Drawing.Point(608, 69);
+            this.SearchNumber.Margin = new System.Windows.Forms.Padding(4);
+            this.SearchNumber.Name = "SearchNumber";
+            this.SearchNumber.Size = new System.Drawing.Size(193, 22);
+            this.SearchNumber.TabIndex = 6;
+            // 
+            // button1
+            // 
+            this.button1.AutoSize = true;
+            this.button1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button1.BackgroundImage")));
+            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.button1.Location = new System.Drawing.Point(828, 60);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(43, 41);
+            this.button1.TabIndex = 3;
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // SelectItems
+            // 
+            this.SelectItems.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.SelectItems.FormattingEnabled = true;
+            this.SelectItems.Items.AddRange(new object[] {
+            "No",
+            "Product Family",
+            "证书编号",
+            "状态",
+            "Factory",
+            "规格/描述1(证书上)",
+            "规格/描述2(SAP上)",
+            "产品12NC"});
+            this.SelectItems.Location = new System.Drawing.Point(417, 69);
+            this.SelectItems.Margin = new System.Windows.Forms.Padding(4);
+            this.SelectItems.Name = "SelectItems";
+            this.SelectItems.Size = new System.Drawing.Size(160, 24);
+            this.SelectItems.TabIndex = 3;
+            // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.buttonImport);
+            this.groupBox2.Controls.Add(this.btnInverseAll);
+            this.groupBox2.Controls.Add(this.btnSelectAll);
+            this.groupBox2.Controls.Add(this.btnExport);
+            this.groupBox2.Controls.Add(this.dgvProduct);
             this.groupBox2.Controls.Add(this.btnAdd);
             this.groupBox2.Controls.Add(this.btnDelete);
-            this.groupBox2.Controls.Add(this.dgvProduct);
-            this.groupBox2.Location = new System.Drawing.Point(12, 147);
+            this.groupBox2.Location = new System.Drawing.Point(16, 181);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(1121, 374);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox2.Size = new System.Drawing.Size(1495, 460);
             this.groupBox2.TabIndex = 7;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Product Family";
             // 
-            // btnAdd
+            // btnInverseAll
             // 
-            this.btnAdd.Location = new System.Drawing.Point(823, 334);
-            this.btnAdd.Name = "btnAdd";
-            this.btnAdd.Size = new System.Drawing.Size(125, 25);
-            this.btnAdd.TabIndex = 2;
-            this.btnAdd.Text = "添加";
-            this.btnAdd.UseVisualStyleBackColor = true;
-            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            this.btnInverseAll.Location = new System.Drawing.Point(590, 411);
+            this.btnInverseAll.Margin = new System.Windows.Forms.Padding(4);
+            this.btnInverseAll.Name = "btnInverseAll";
+            this.btnInverseAll.Size = new System.Drawing.Size(167, 31);
+            this.btnInverseAll.TabIndex = 5;
+            this.btnInverseAll.Text = "反选";
+            this.btnInverseAll.UseVisualStyleBackColor = true;
+            this.btnInverseAll.Click += new System.EventHandler(this.btnInverseAll_Click);
             // 
-            // btnDelete
+            // btnSelectAll
             // 
-            this.btnDelete.Location = new System.Drawing.Point(959, 334);
-            this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(125, 25);
-            this.btnDelete.TabIndex = 1;
-            this.btnDelete.Text = "删除";
-            this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            this.btnSelectAll.Location = new System.Drawing.Point(400, 411);
+            this.btnSelectAll.Margin = new System.Windows.Forms.Padding(4);
+            this.btnSelectAll.Name = "btnSelectAll";
+            this.btnSelectAll.Size = new System.Drawing.Size(167, 31);
+            this.btnSelectAll.TabIndex = 4;
+            this.btnSelectAll.Text = "全选";
+            this.btnSelectAll.UseVisualStyleBackColor = true;
+            this.btnSelectAll.Click += new System.EventHandler(this.btnSelectAll_Click);
+            // 
+            // btnExport
+            // 
+            this.btnExport.Location = new System.Drawing.Point(209, 411);
+            this.btnExport.Margin = new System.Windows.Forms.Padding(4);
+            this.btnExport.Name = "btnExport";
+            this.btnExport.Size = new System.Drawing.Size(167, 31);
+            this.btnExport.TabIndex = 3;
+            this.btnExport.Text = "导出";
+            this.btnExport.UseVisualStyleBackColor = true;
+            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // dgvProduct
             // 
             this.dgvProduct.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dgvProduct.BackgroundColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvProduct.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvProduct.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dgvProduct.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvProduct.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvProduct.DefaultCellStyle = dataGridViewCellStyle2;
-            this.dgvProduct.Location = new System.Drawing.Point(17, 22);
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvProduct.DefaultCellStyle = dataGridViewCellStyle5;
+            this.dgvProduct.Location = new System.Drawing.Point(23, 27);
+            this.dgvProduct.Margin = new System.Windows.Forms.Padding(4);
             this.dgvProduct.Name = "dgvProduct";
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dgvProduct.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("SimSun", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dgvProduct.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.dgvProduct.RowHeadersVisible = false;
             this.dgvProduct.RowTemplate.Height = 23;
-            this.dgvProduct.Size = new System.Drawing.Size(1086, 298);
+            this.dgvProduct.Size = new System.Drawing.Size(1448, 367);
             this.dgvProduct.TabIndex = 0;
             this.dgvProduct.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvProduct_CellValueChanged);
             this.dgvProduct.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgvProduct_CurrentCellDirtyStateChanged);
@@ -204,47 +204,47 @@
             this.Column1.Visible = false;
             this.Column1.Width = 50;
             // 
-            // groupBox1
+            // btnAdd
             // 
-            this.groupBox1.Controls.Add(this.rbOutdoor);
-            this.groupBox1.Controls.Add(this.rbIndoor);
-            this.groupBox1.Location = new System.Drawing.Point(851, 13);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(282, 128);
-            this.groupBox1.TabIndex = 8;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Mode";
+            this.btnAdd.Location = new System.Drawing.Point(1097, 411);
+            this.btnAdd.Margin = new System.Windows.Forms.Padding(4);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(167, 31);
+            this.btnAdd.TabIndex = 2;
+            this.btnAdd.Text = "添加";
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
             // 
-            // rbOutdoor
+            // btnDelete
             // 
-            this.rbOutdoor.AutoSize = true;
-            this.rbOutdoor.Location = new System.Drawing.Point(117, 70);
-            this.rbOutdoor.Name = "rbOutdoor";
-            this.rbOutdoor.Size = new System.Drawing.Size(63, 18);
-            this.rbOutdoor.TabIndex = 1;
-            this.rbOutdoor.TabStop = true;
-            this.rbOutdoor.Text = "Outdoor";
-            this.rbOutdoor.UseVisualStyleBackColor = true;
+            this.btnDelete.Location = new System.Drawing.Point(1279, 411);
+            this.btnDelete.Margin = new System.Windows.Forms.Padding(4);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(167, 31);
+            this.btnDelete.TabIndex = 1;
+            this.btnDelete.Text = "删除";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
-            // rbIndoor
+            // buttonImport
             // 
-            this.rbIndoor.AutoSize = true;
-            this.rbIndoor.Location = new System.Drawing.Point(117, 33);
-            this.rbIndoor.Name = "rbIndoor";
-            this.rbIndoor.Size = new System.Drawing.Size(55, 18);
-            this.rbIndoor.TabIndex = 0;
-            this.rbIndoor.TabStop = true;
-            this.rbIndoor.Text = "Indoor";
-            this.rbIndoor.UseVisualStyleBackColor = true;
+            this.buttonImport.Location = new System.Drawing.Point(23, 411);
+            this.buttonImport.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonImport.Name = "buttonImport";
+            this.buttonImport.Size = new System.Drawing.Size(167, 31);
+            this.buttonImport.TabIndex = 6;
+            this.buttonImport.Text = "导入";
+            this.buttonImport.UseVisualStyleBackColor = true;
+            this.buttonImport.Click += new System.EventHandler(this.buttonImport_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1145, 534);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(1527, 657);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.gbSearch);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Philips Lighting Luminaries Choicesheet";
@@ -253,29 +253,25 @@
             this.gbSearch.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvProduct)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btn12NC;
-        private System.Windows.Forms.Button btnNaming;
-        private System.Windows.Forms.TextBox txt12NC;
-        private System.Windows.Forms.TextBox txtNaming;
         private System.Windows.Forms.GroupBox gbSearch;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.DataGridView dgvProduct;
         private System.Windows.Forms.Button btnAdd;
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.DataGridViewCheckBoxColumn Column1;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.RadioButton rbOutdoor;
-        private System.Windows.Forms.RadioButton rbIndoor;
+        private System.Windows.Forms.ComboBox SelectItems;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox SearchNumber;
+        private System.Windows.Forms.Button btnExport;
+        private System.Windows.Forms.Button btnSelectAll;
+        private System.Windows.Forms.Button btnInverseAll;
+        private System.Windows.Forms.Button buttonImport;
     }
 }
 
