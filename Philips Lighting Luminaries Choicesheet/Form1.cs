@@ -19,11 +19,18 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             OS_INSERT
         }
 
+        public enum StoreResult
+        {
+            RES_SUCCESS,
+            RES_DUPLICATE,
+            RES_INVALID
+        }
+
         private bool _firstColVisible;
         private const string PRI_KEY = "产品12NC";
         private const string CET_NO = "证书编号";
         private const string PRODUCT = "Product";
-        private const string DESCRIPTION1 = "规格/描述1(证书上)";
+        private const string INDEX = "序列号";
         private const int KEY_NUM = 12;
         private OperationState _os;
 
@@ -45,7 +52,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
                 { //使用完毕自动释放
                     DataSet ds = new DataSet();
-                    OleDbDataAdapter da = new OleDbDataAdapter(String.Format("select * from [{0}] where [{1}] like '%{2}%'", PRODUCT, item, content), con);
+                    String cmdtext = String.Format("select * from [{0}] where \"{1}\" like '%{2}%'", PRODUCT, item, content);
+                    OleDbDataAdapter da = new OleDbDataAdapter(cmdtext, con);
                     da.Fill(ds); //对ds添加数据
                     this.dgvProduct.DataSource = ds.Tables[0].DefaultView;
                 }
@@ -75,12 +83,12 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 this.dgvProduct.AllowUserToAddRows = true;
                 if (this.dgvProduct.Columns.Count <= 1)
                 {
-                    this.dgvProduct.Columns.Add("No", "No");
+                    this.dgvProduct.Columns.Add("归档号", "归档号");
                     this.dgvProduct.Columns.Add("ProductFamily", "ProductFamily");
                     this.dgvProduct.Columns.Add(CET_NO, CET_NO);
                     this.dgvProduct.Columns.Add("状态", "状态");
                     this.dgvProduct.Columns.Add("Factory", "Factory");
-                    this.dgvProduct.Columns.Add(DESCRIPTION1, DESCRIPTION1);
+                    this.dgvProduct.Columns.Add("规格/描述1(证书上)", "规格/描述1(证书上)");
                     this.dgvProduct.Columns.Add("规格/描述2(SAP上)", "规格/描述2(SAP上)");
                     this.dgvProduct.Columns.Add(PRI_KEY, PRI_KEY);
                 }
@@ -142,11 +150,11 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             }
                             else
                             {
-                                if (cc.Cells[DESCRIPTION1].Value != null)
+                                if (cc.Cells[INDEX].Value != null)
                                 {
-                                    if(isDescription1Dup(cc.Cells[DESCRIPTION1].Value.ToString()))
+                                    if(isItemDup(cc.Cells[INDEX].Value.ToString()))
                                     {
-                                        MessageBox.Show("数据库证书描述重复！");
+                                        MessageBox.Show("序列号不能重复！");
                                         res++;
                                     }
                                 }
@@ -307,7 +315,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SearchProduct(this.SelectItems.SelectedItem.ToString(), this.SearchNumber.Text.ToString());
+            if(this.SearchNumber.Text != string.Empty)
+                SearchProduct(this.SelectItems.SelectedItem.ToString(), this.SearchNumber.Text.ToString());
         }
 
         private void btnExport_Click(object sender, EventArgs e)
@@ -477,7 +486,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             return res;
         }
 
-        private bool isDescription1Dup(String des1)
+        private bool isItemDup(String index)
         {
             bool res = false;
 
@@ -486,7 +495,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 con.Open();
 
-                String command = String.Format("select * from [{0}] where [规格/描述1(证书上)] like '{1}'", PRODUCT, des1.ToString());
+                String command = String.Format("select * from [{0}] where [序列号] like '{1}'", PRODUCT, index.ToString());
                 //MessageBox.Show(command);
                 OleDbCommand com = new OleDbCommand(command, con);
                 //com.ExecuteNonQuery();
@@ -497,6 +506,47 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 }
 
                 con.Close();
+            }
+
+            return res;
+        }
+
+        private StoreResult storeRowValue2Database(OleDbConnection con, DataRow r, int c)
+        {
+            StoreResult res = StoreResult.RES_SUCCESS;
+
+            try
+            {
+                if (isRowValueValid(r, c))
+                {
+                    // Add to mdb
+                    String command = String.Format("insert into [{0}] values(", PRODUCT);
+                    for (int i = 0; i < c; ++i)
+                    {
+                        if(i == 0)
+                            command += String.Format("'{0}'", r[0].ToString());
+                        else
+                            command += String.Format(",'{0}'", r[i].ToString());
+                    }
+                    command += ")";
+
+                    //MessageBox.Show(command);
+                    OleDbCommand com = new OleDbCommand(command, con);
+                    com.ExecuteNonQuery();
+                }
+                else
+                {
+                    res = StoreResult.RES_INVALID;
+                }
+            }
+
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.ToString());
+                if (ex.ToString().Contains("duplicate"))
+                    res = StoreResult.RES_DUPLICATE;
+                else
+                    res = StoreResult.RES_INVALID;
             }
 
             return res;
@@ -555,6 +605,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                     }
 
                                     app.CloseSheet(worksheet);
+                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
+
                                     index++;
                                 }
 
@@ -563,75 +615,56 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
                                 if (dt.Rows.Count > 0)
                                 {
-                                    for (int i = 0; i < dt.Rows.Count; i++)
+                                    // 打开mdb
+                                    using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
                                     {
-                                        // go through each row in current sheet
-                                        if (isRowValueValid(dt.Rows[i], dt.Columns.Count))
-                                        {
-                                            if (isDescription1Dup(dt.Rows[i][5].ToString()))
-                                            {
-                                                duplicate++;
-                                                duplicateList += String.Format("\r\n{0}", dt.Rows[i][5].ToString());
-                                            }
-                                                
-                                            else
-                                                count++;
-                                        }
-                                        else
-                                        {
-                                            error++;
-                                            continue;
-                                        }
-                                    }
+                                        con.Open();
 
-                                    String msg = String.Format("Find {0} valid, {1} invalid, {2} duplicated records totally.", count.ToString(), error.ToString(), duplicate.ToString());
-                                    if (duplicate > 0 || error > 0)
-                                    {
-                                        if (duplicate > 0)
+                                        for (int i = 0; i < dt.Rows.Count; i++)
                                         {
-                                            msg += String.Format("\r\n\r\nDuplicated:\r\n{0}", duplicateList.ToString());
-                                        }
-                                        MessageBox.Show(msg, "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    }
-                                    else if (DialogResult.OK == MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Asterisk))
-                                    {
-                                        // 打开mdb
-                                        using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
-                                        {
-                                            con.Open();
-
-                                            for (int i = 0; i < dt.Rows.Count; i++)
+                                            // go through each row and store in database
+                                            if (isRowValueValid(dt.Rows[i], dt.Columns.Count))
                                             {
-                                                if (isRowValueValid(dt.Rows[i], dt.Columns.Count))
+                                                StoreResult res;
+                                                if ((res = storeRowValue2Database(con, dt.Rows[i], dt.Columns.Count)) != StoreResult.RES_SUCCESS)
                                                 {
-                                                    // Add to mdb
-                                                    String command = String.Format("insert into [{0}] values({1}", PRODUCT, dt.Rows[i][0].ToString());
-                                                    for (int c = 1; c < dt.Columns.Count; ++c)
+                                                    if (res == StoreResult.RES_DUPLICATE)
                                                     {
-                                                       command += String.Format(",'{0}'", dt.Rows[i][c].ToString());
+                                                        duplicate++;
                                                     }
-                                                    command += ")";
-
-                                                    //MessageBox.Show(command);
-                                                    OleDbCommand com = new OleDbCommand(command, con);
-                                                    com.ExecuteNonQuery();
+                                                    else if (res == StoreResult.RES_INVALID)
+                                                    {
+                                                        error++;
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    continue;
+                                                    count++;
                                                 }
                                             }
-
-                                            con.Close();
+                                            else
+                                            {
+                                                error++;
+                                            }
                                         }
-                                    } // Click OK in diaglueBox
+
+                                        con.Close();
+                                    }
                                 }
+
+                                String msg = String.Format("Insert {0} records into database \r\n\r\n {1} invalid, {2} duplicated records found.", count.ToString(), error.ToString(), duplicate.ToString());
+                                MessageBox.Show(msg, "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
                                 MessageBox.Show("Excel打开失败！");
                             }
+
+                            //System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
                         }// End using (SEHApplication app = new SEHApplication())
+
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
                 } // End if( openSysFileDialog.ShowDialog() == DialogResult.OK)
             }
 
