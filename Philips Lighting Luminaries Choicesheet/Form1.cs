@@ -13,12 +13,6 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 {
     public partial class Form1 : Form
     {
-        public enum OperationState
-        {
-            OS_NORMAL,
-            OS_INSERT
-        }
-
         public enum StoreResult
         {
             RES_SUCCESS,
@@ -32,31 +26,79 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         private const string PRODUCT = "Product";
         private const string INDEX = "序列号";
         private const int KEY_NUM = 12;
-        private OperationState _os;
+
+        public enum userGrp
+        {
+            UG_ADMIN,
+            UG_OPERATOR,
+            UG_UNKNOWN
+        }
+
+        public class userInfo
+        {
+            public String name;
+            public userGrp group;
+        }
+
+        public userInfo curUser = new userInfo();
 
         public Form1()
         {
             InitializeComponent();
+            curUser.name = "Anonymous";
+            curUser.group = userGrp.UG_UNKNOWN;
+        }
+
+        private void DisableUserEditContent(DataGridView g)
+        {
+            g.Columns[0].ReadOnly = false;
+            g.Columns["序列号"].ReadOnly = true;
+            g.Columns["归档号"].ReadOnly = true;
+            g.Columns["ProductFamily"].ReadOnly = true;
+            g.Columns["证书编号"].ReadOnly = true;
+            g.Columns["状态"].ReadOnly = true;
+            g.Columns["Factory"].ReadOnly = true;
+            g.Columns["规格/描述1(证书上)"].ReadOnly = true;
+            g.Columns["规格/描述2(SAP上)"].ReadOnly = true;
+            g.Columns["产品12NC"].ReadOnly = true;
+        }
+
+        private void EnableUserEditContent(DataGridView g)
+        {
+            g.Columns[0].ReadOnly = true;
+            g.Columns["序列号"].ReadOnly = false;
+            g.Columns["归档号"].ReadOnly = false;
+            g.Columns["ProductFamily"].ReadOnly = false;
+            g.Columns["证书编号"].ReadOnly = false;
+            g.Columns["状态"].ReadOnly = false;
+            g.Columns["Factory"].ReadOnly = false;
+            g.Columns["规格/描述1(证书上)"].ReadOnly = false;
+            g.Columns["规格/描述2(SAP上)"].ReadOnly = false;
+            g.Columns["产品12NC"].ReadOnly = false;
         }
 
         private void SearchProduct(string item, string content)
         {//"12NC码",12NC码
-            if (!_firstColVisible)
-            {//搜索时第一列可见
-                _firstColVisible = true;
-                this.dgvProduct.Columns[0].Visible = true;
-            }
-
             try
             {
+
                 using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
                 { //使用完毕自动释放
                     DataSet ds = new DataSet();
-                    String cmdtext = String.Format("select * from [{0}] where \"{1}\" like '%{2}%'", PRODUCT, item, content);
+                    String cmdtext;
+                    if(item.Equals("序列号") || item.Equals("归档号"))
+                        cmdtext = String.Format("select * from [{0}] where [{1}] like '{2}'", PRODUCT, item, content);
+                    else
+                        cmdtext = String.Format("select * from [{0}] where [{1}] like '%{2}%'", PRODUCT, item, content);
+                    //String cmdtext = String.Format("select * from [{0}] where trim(replace({1},' ','')) like trim(replace('%{2}%',' ',''))", PRODUCT, item, content);
                     OleDbDataAdapter da = new OleDbDataAdapter(cmdtext, con);
                     da.Fill(ds); //对ds添加数据
                     this.dgvProduct.DataSource = ds.Tables[0].DefaultView;
                 }
+
+                DisableUserEditContent(this.dgvProduct);
+                this.btnDelete.Enabled = false;
+                this.btnAdd.Text = "添加";
             }
             catch (System.Exception ex)
             {
@@ -66,23 +108,35 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            if (_os == OperationState.OS_NORMAL)
+            Button btn = (Button)sender;
+            if(String.Compare(btn.Text, "添加") == 0)
             {
-                _os = OperationState.OS_INSERT;
+                if (curUser.group != userGrp.UG_ADMIN)
+                    return;
+
                 this.gbSearch.Enabled = false;
                 this.btnExport.Enabled = false;
                 this.btnSelectAll.Enabled = false;
                 this.btnInverseAll.Enabled = false;
+                this.buttonImport.Enabled = false;
+                this.Column1.Visible = false;
+
                 this.btnAdd.Text = "确定";
                 this.btnDelete.Enabled = true;
-                this.btnDelete.Text = "取消";
-                while (this.dgvProduct.Rows.Count > 0)
-                {
-                    this.dgvProduct.Rows.RemoveAt(0);
-                }
+                this.btnDelete.Text = "放弃";
+                //while (this.dgvProduct.Rows.Count > 0)
+                //{
+                //    this.dgvProduct.Rows.RemoveAt(0);
+                //}
+                if(this.dgvProduct.DataSource != null)
+                    this.dgvProduct.DataSource = null;
+
+                this.dgvProduct.Rows.Clear();
+
                 this.dgvProduct.AllowUserToAddRows = true;
                 if (this.dgvProduct.Columns.Count <= 1)
                 {
+                    this.dgvProduct.Columns.Add("序列号", "序列号");
                     this.dgvProduct.Columns.Add("归档号", "归档号");
                     this.dgvProduct.Columns.Add("ProductFamily", "ProductFamily");
                     this.dgvProduct.Columns.Add(CET_NO, CET_NO);
@@ -98,12 +152,86 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     _firstColVisible = false;
                 }
             }
+            else if (String.Compare(btn.Text, "确定") == 0)
+            {
+                //for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
+                //{
+                    //this.dgvProduct.Rows[r].Cells[0].Selected = true;
+                //    this.dgvProduct.Rows[r].Cells[0].Value = true;
+                //}
+
+                if (true == AddProduct(false))
+                {
+                    MessageBox.Show("添加成功");
+
+                    if (this.dgvProduct.DataSource != null)
+                        this.dgvProduct.DataSource = null;
+
+                    this.dgvProduct.AllowUserToAddRows = false;
+                    this.dgvProduct.Rows.Clear();
+                    this.dgvProduct.Columns.Clear();
+                    this.dgvProduct.Columns.Add(Column1);
+                    this.Column1.Visible = false;
+
+                    this.btnDelete.Text = "删除";
+                    this.btnDelete.Enabled = false;
+                    this.btnAdd.Text = "添加";
+
+                    this.gbSearch.Enabled = true;
+                    this.btnExport.Enabled = true;
+                    this.btnSelectAll.Enabled = true;
+                    this.btnInverseAll.Enabled = true;
+                    this.buttonImport.Enabled = true;
+                    this.Column1.Visible = false;
+                }
+                    
+            }
+            else if (String.Compare(btn.Text, "编辑") == 0)
+            {
+                if (curUser.group != userGrp.UG_ADMIN)
+                    return;
+
+                EnableUserEditContent(this.dgvProduct);
+                this.btnDelete.Text = "取消";
+                this.btnAdd.Text = "提交";
+
+                for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
+                {
+                    if (Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
+                        this.dgvProduct.Rows[r].ReadOnly = false;
+                }
+
+                this.dgvProduct.Columns[0].ReadOnly = true;
+                this.dgvProduct.Columns["序列号"].ReadOnly = true;
+
+                this.gbSearch.Enabled = false;
+                this.btnExport.Enabled = false;
+                this.btnSelectAll.Enabled = false;
+                this.btnInverseAll.Enabled = false;
+                this.buttonImport.Enabled = false;
+            }
+            else if (String.Compare(btn.Text, "提交") == 0)
+            {
+                if (true == AddProduct(true))
+                {
+                    MessageBox.Show("修改成功");
+
+                    this.gbSearch.Enabled = true;
+                    this.btnExport.Enabled = true;
+                    this.btnSelectAll.Enabled = true;
+                    this.btnInverseAll.Enabled = true;
+                    this.buttonImport.Enabled = true;
+
+                    this.btnDelete.Text = "删除";
+                    this.btnAdd.Text = "编辑";
+                    DisableUserEditContent(this.dgvProduct);
+                }
+                    
+            }
             else
             {
-                if (AddProduct())
-                {
-                    //RefreshNormal();  //添加成功后，恢复到搜索界面
-                }
+                String msg = String.Format("Unkown support type: {0}", btn.Text.ToString());
+                MessageBox.Show(msg);
             }
         }
 
@@ -127,7 +255,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             return true;
         }
 
-        private bool AddProduct()
+        private bool AddProduct(bool ignoreIndex)
         { //向数据库中添加
             bool result = false;
             int res = 0;
@@ -138,8 +266,11 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
                 {
                     con.Open();
-                    for (int j = 0; j < this.dgvProduct.Rows.Count - 1;++j )
+                    for (int j = 0; j < ((false==ignoreIndex)? (this.dgvProduct.Rows.Count-1) : this.dgvProduct.Rows.Count);++j )
                     {
+                        if ((ignoreIndex) && (false == Convert.ToBoolean(this.dgvProduct.Rows[j].Cells[0].Value)))
+                            continue;
+
                         DataGridViewRow cc = this.dgvProduct.Rows[j];
                         if (cc.Cells[CET_NO].Value != null)
                         {
@@ -152,7 +283,18 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             {
                                 if (cc.Cells[INDEX].Value != null)
                                 {
-                                    if(isItemDup(cc.Cells[INDEX].Value.ToString()))
+                                    foreach (char c in cc.Cells[INDEX].Value.ToString())
+                                    {
+                                        if (c < '0' || c > '9')
+                                        {
+                                            res++;
+                                        }
+                                    }
+
+                                    if(res != 0)
+                                        MessageBox.Show("序列号必须为数字！");
+
+                                    if ((res == 0) && (!ignoreIndex) && isItemDup(cc.Cells[INDEX].Value.ToString()))
                                     {
                                         MessageBox.Show("序列号不能重复！");
                                         res++;
@@ -174,23 +316,49 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
                     if (0 == res)
                     {
-                        for (int j = 0; j < this.dgvProduct.Rows.Count - 1; ++j)
+                        for (int j = 0; j < ((false == ignoreIndex) ? (this.dgvProduct.Rows.Count - 1) : this.dgvProduct.Rows.Count); ++j)
                         {
+                            if ((ignoreIndex) && (false == Convert.ToBoolean(this.dgvProduct.Rows[j].Cells[0].Value)))
+                                continue;
+
                             DataGridViewRow cc = this.dgvProduct.Rows[j];
-                            insertItem = String.Format("insert into [{0}] values({1}", PRODUCT, cc.Cells[1].Value == null ? "-1" : cc.Cells[1].Value.ToString());
-                            for (int i = 2; i < cc.Cells.Count; ++i)
+
+                            if (ignoreIndex)
                             {
-                                insertItem += String.Format(",'{0}'", cc.Cells[i].Value == null ? "" : cc.Cells[i].Value.ToString());
+                                // this is update db
+                                insertItem = String.Format("update {0} set [归档号]='{1}', [ProductFamily]='{2}', [证书编号]='{3}', [状态]='{4}', [Factory]='{5}', [规格/描述1(证书上)]='{6}', [规格/描述2(SAP上)]='{7}', [产品12NC]='{8}'",
+                                    PRODUCT,
+                                    cc.Cells[2].Value.ToString(),
+                                    cc.Cells[3].Value.ToString(),
+                                    cc.Cells[4].Value.ToString(),
+                                    cc.Cells[5].Value.ToString(),
+                                    cc.Cells[6].Value.ToString(),
+                                    cc.Cells[7].Value.ToString(),
+                                    cc.Cells[8].Value.ToString(),
+                                    cc.Cells[9].Value.ToString());
+                                insertItem += String.Format(" WHERE [{0}]={1}", INDEX, cc.Cells[1].Value.ToString());
+
                             }
-                            insertItem += ")";
+                            else
+                            {
+                                // insert db
+                                insertItem = String.Format("insert into [{0}] values({1}", PRODUCT, cc.Cells[1].Value == null ? "-1" : cc.Cells[1].Value.ToString());
+                                for (int i = 2; i < cc.Cells.Count; ++i)
+                                {
+                                    insertItem += String.Format(",'{0}'", cc.Cells[i].Value == null ? "" : cc.Cells[i].Value.ToString());
+                                }
+                                insertItem += ")";
+                            }
+
                             OleDbCommand com = new OleDbCommand(insertItem, con);
                             com.ExecuteNonQuery();
 
-                            this.dgvProduct.Rows.Remove(cc);
-                            --j;
+                            //this.dgvProduct.Rows.Remove(cc);
+                            //--j;
                         }
                         result = true;
-                    } 
+                    }
+                    con.Close();
                 }   
             }
             catch (System.Exception e)
@@ -203,39 +371,87 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            if (_os == OperationState.OS_NORMAL)
+            Button btn = (Button)sender;
+            if (String.Compare(btn.Text, "放弃") == 0)
             {
+                this.dgvProduct.Rows.Clear();
+                this.dgvProduct.Columns.Clear();
+                this.dgvProduct.Columns.Add(Column1);
+                this.Column1.Visible = false;
+                this.dgvProduct.AllowUserToAddRows = false;
+
+                this.btnDelete.Text = "删除";
+                this.btnDelete.Enabled = false;
+                this.btnAdd.Text = "添加";
+
+                this.gbSearch.Enabled = true;
+                this.btnExport.Enabled = true;
+                this.btnSelectAll.Enabled = true;
+                this.btnInverseAll.Enabled = true;
+                this.buttonImport.Enabled = true;
+            }
+            else if(String.Compare(btn.Text, "取消") == 0)
+            {
+                this.btnDelete.Text = "删除";
+                this.btnAdd.Text = "编辑";
+                DisableUserEditContent(this.dgvProduct);
+
+                this.gbSearch.Enabled = true;
+                this.btnExport.Enabled = true;
+                this.btnSelectAll.Enabled = true;
+                this.btnInverseAll.Enabled = true;
+                this.buttonImport.Enabled = true;
+            }
+            else if (String.Compare(btn.Text, "删除") == 0)
+            {
+                if (curUser.group != userGrp.UG_ADMIN)
+                    return;
+
                 string eraseItem = "";
                 List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
                 foreach (DataGridViewRow cc in this.dgvProduct.Rows)
                 {
                     if (Convert.ToBoolean(cc.Cells[0].Value))
                     {
-                        eraseItem += String.Format("'{0}',", cc.Cells[PRI_KEY].Value);
+                        eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
                         targetRows.Add(cc);
                     }
                 }
-                if (!String.IsNullOrEmpty(eraseItem))
+
+                string msg = String.Format("选择了 {0} 条记录，确定要删除吗？", targetRows.Count.ToString());
+                if(MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
                 {
-                    eraseItem = String.Format("delete from [{0}] where {1} in ({2})", PRODUCT, PRI_KEY, eraseItem.Remove(eraseItem.Length - 1, 1));
-                    if (Operate(eraseItem))
+                    if (!String.IsNullOrEmpty(eraseItem))
                     {
-                        foreach (DataGridViewRow cc in targetRows)
+                        eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
+                        if (Operate(eraseItem))
                         {
-                            this.dgvProduct.Rows.Remove(cc);
+                            foreach (DataGridViewRow cc in targetRows)
+                            {
+                                this.dgvProduct.Rows.Remove(cc);
+                            }
                         }
                     }
                 }
+
+                if (this.dgvProduct.Rows.Count == 0)
+                {
+                    // no rows in current view
+                    this.btnDelete.Enabled = false;
+                    this.btnAdd.Text = "添加";
+                }
+
             }
             else
             {
-                RefreshNormal();
+                String msg = String.Format("Unkown support type: {0}", btn.Text.ToString());
+                MessageBox.Show(msg);
             }
+
         }
 
         private void RefreshNormal()
         {
-            _os = OperationState.OS_NORMAL;
             this.gbSearch.Enabled = true;
             this.btnExport.Enabled = true;
             this.btnSelectAll.Enabled = true;
@@ -276,18 +492,66 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            this.dgvProduct.AllowUserToAddRows = false; //搜索界面不能添加行
-            _firstColVisible = false;
-            this.btnDelete.Enabled = _firstColVisible; //删除键不可用
-            _os = OperationState.OS_NORMAL;  //当前状态为查询状态而非添加状态
-            this.SelectItems.SelectedIndex = 7;
+            Form f2 = new login(this);
+            f2.ShowDialog();
+            if (f2.DialogResult == DialogResult.OK)
+            {
+                this.dgvProduct.AllowUserToAddRows = false; //搜索界面不能添加行
+                _firstColVisible = false;
+                this.btnDelete.Enabled = _firstColVisible; //删除键不可用
+                this.SelectItems.SelectedIndex = 0;
+            }
+            else
+                this.Close();
+        }
+
+        public void StatusUpdateTimerOnTick(object sender, EventArgs e)
+        {
+            DateTime dt = DateTime.Now;
+    
+            this.toolStripStatusLabel1.Text = dt.ToString("yyyy年MM月dd日 HH:mm:ss");
+            if(curUser.group == userGrp.UG_OPERATOR)
+                this.toolStripStatusLabel1.Text += "  欢迎您，操作员！";
+            else if (curUser.group == userGrp.UG_ADMIN)
+                this.toolStripStatusLabel1.Text += "  欢迎您，管理员！";
+            else 
+                this.toolStripStatusLabel1.Text += "  欢迎您，非法用户！";
         }
 
         private void dgvProduct_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         { //值改变
+            bool toSelected = false;
             if (e.RowIndex >= 0 && e.ColumnIndex == 0)
             { //第零列改变
-                this.btnDelete.Enabled = EnableDeleteBtn();
+                if (Convert.ToBoolean(this.dgvProduct.Rows[e.RowIndex].Cells[0].Value))
+                    toSelected = true;
+
+                //{
+                    if (toSelected == true)
+                    {
+                        this.btnDelete.Enabled = EnableDeleteBtn();
+
+                        this.btnAdd.Text = "编辑";
+                        this.btnDelete.Text = "删除";
+                        //EnableUserEditContent(this.dgvProduct);
+                    }
+                    else
+                    {
+                        // check 有没有选中的了
+                        bool stillSelect = false;
+                        for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
+                            if (Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
+                                stillSelect = true;
+
+                        if (stillSelect == false)
+                        {
+                            this.btnDelete.Enabled = false;
+                            this.btnAdd.Text = "添加";
+                        }
+                    }
+                    
+                //}
+                
             }
         }
 
@@ -307,6 +571,10 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void dgvProduct_CurrentCellDirtyStateChanged(object sender, EventArgs e)
         { //缓存有修改
+            DataGridView dgv = (DataGridView)sender;
+            if (dgv.CurrentCell.ColumnIndex != 0)
+                return;
+            
             if (this.dgvProduct.IsCurrentCellDirty) //修改数据未提交
             {
                 this.dgvProduct.CommitEdit(DataGridViewDataErrorContexts.Commit);
@@ -315,8 +583,11 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if(this.SearchNumber.Text != string.Empty)
+            if (this.SearchNumber.Text != string.Empty)
+            {
+                this.Column1.Visible = true;
                 SearchProduct(this.SelectItems.SelectedItem.ToString(), this.SearchNumber.Text.ToString());
+            }
         }
 
         private void btnExport_Click(object sender, EventArgs e)
@@ -554,6 +825,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void buttonImport_Click(object sender, EventArgs e)
         {
+            if (curUser.group != userGrp.UG_ADMIN)
+                return;
 
             try
             {
@@ -570,7 +843,6 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                         Int32 count = 0; // 记录数目
                         Int32 error = 0;
                         Int32 duplicate = 0;
-                        String duplicateList = String.Format("");
 
                         // 读取excel 数据并保存
                         using (SEHApplication app = new SEHApplication())
@@ -672,6 +944,11 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        private void StatusUpdateTimerOnTick()
+        {
+
         }
     }
 }
