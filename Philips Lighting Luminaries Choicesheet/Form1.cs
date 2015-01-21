@@ -51,6 +51,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
         private void DisableUserEditContent(DataGridView g)
         {
+            for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
+            {
+                if (!Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
+                {
+                    this.dgvProduct.Rows[r].ReadOnly = false;
+                }
+            }
+
             g.Columns[0].ReadOnly = false;
             g.Columns["序列号"].ReadOnly = true;
             g.Columns["归档号"].ReadOnly = true;
@@ -75,6 +83,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             g.Columns["规格/描述1(证书上)"].ReadOnly = false;
             g.Columns["规格/描述2(SAP上)"].ReadOnly = false;
             g.Columns["产品12NC"].ReadOnly = false;
+
+            for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
+            {
+                if (!Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
+                {
+                    this.dgvProduct.Rows[r].ReadOnly = true;
+                }
+            }
         }
 
         private void SearchProduct(string item, string content)
@@ -195,12 +211,6 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 this.btnDelete.Text = "取消";
                 this.btnAdd.Text = "提交";
 
-                for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
-                {
-                    if (Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
-                        this.dgvProduct.Rows[r].ReadOnly = false;
-                }
-
                 this.dgvProduct.Columns[0].ReadOnly = true;
                 this.dgvProduct.Columns["序列号"].ReadOnly = true;
 
@@ -224,6 +234,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
                     this.btnDelete.Text = "删除";
                     this.btnAdd.Text = "编辑";
+
                     DisableUserEditContent(this.dgvProduct);
                 }
                     
@@ -394,6 +405,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 this.btnDelete.Text = "删除";
                 this.btnAdd.Text = "编辑";
+
                 DisableUserEditContent(this.dgvProduct);
 
                 this.gbSearch.Enabled = true;
