@@ -82,7 +82,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             try
             {
 
-                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
+                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
                 { //使用完毕自动释放
                     DataSet ds = new DataSet();
                     String cmdtext;
@@ -263,7 +263,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             string insertItem = "";
             try
             {
-                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
+                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
                 {
                     con.Open();
                     for (int j = 0; j < ((false==ignoreIndex)? (this.dgvProduct.Rows.Count-1) : this.dgvProduct.Rows.Count);++j )
@@ -475,7 +475,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             bool result = false;
             try
             {
-                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
+                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
                 {
                     con.Open();
                     OleDbCommand com = new OleDbCommand(cmd, con);
@@ -762,7 +762,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             bool res = false;
 
             // 打开mdb
-            using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
+            using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
             {
                 con.Open();
 
@@ -888,7 +888,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                 if (dt.Rows.Count > 0)
                                 {
                                     // 打开mdb
-                                    using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb"))
+                                    using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
                                     {
                                         con.Open();
 

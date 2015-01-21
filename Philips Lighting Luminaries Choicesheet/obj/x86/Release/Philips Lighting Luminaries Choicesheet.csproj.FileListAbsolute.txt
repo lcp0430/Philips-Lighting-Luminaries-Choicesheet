@@ -37,3 +37,4 @@ C:\Users\310160991\Desktop\PT20141211\Philips Lighting Luminaries Choicesheet\Ph
 C:\Users\310160991\Desktop\PT20141211\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\x86\Release\Philips_Lighting_Luminaries_Choicesheet.login.resources
 C:\Users\310160991\Desktop\PT20141211\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\x86\Release\Philips_Lighting_Luminaries_Choicesheet.Properties.Resources.resources
 C:\Users\310160991\Desktop\PT20141211\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\x86\Release\Philips Lighting Luminaries Choicesheet.csproj.GenerateResource.Cache
+C:\Users\310160991\Desktop\PT20141211\Philips Lighting Luminaries Choicesheet\Philips Lighting Luminaries Choicesheet\obj\x86\Release\Philips Lighting Luminaries Choicesheet.csprojResolveAssemblyReference.cache
