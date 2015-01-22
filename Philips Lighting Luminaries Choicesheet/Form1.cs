@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Data.OleDb;
 using Excel = Microsoft.Office.Interop.Excel;
 using SimpleExcelHelper;
+using System.Threading;
 
 namespace Philips_Lighting_Luminaries_Choicesheet
 {
@@ -835,6 +836,182 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             return res;
         }
 
+        private import myProcessBar = null;
+        private delegate bool IncreaseHandle(int nValue);
+        private IncreaseHandle myIncrease = null;
+
+        private void ShowImportProgressBar()
+        {
+            myProcessBar = new import();
+            myIncrease = new IncreaseHandle(myProcessBar.increase);
+            myProcessBar.ShowDialog();
+            myProcessBar = null;
+        }
+
+        public class ThreadWithParam
+        {
+            //要用到的属性，也就是我们要传递的参数
+            private string fileName;
+            Form1 frm;
+
+            //包含参数的构造函数
+            public ThreadWithParam(string text, Form1 f)
+            {
+                fileName = text;
+                frm = f;
+            }
+            private bool progressBarAddVal(int val)
+            {
+                bool bIncreasd = false;
+                object objRet = null;
+
+                objRet = frm.Invoke(frm.myIncrease, new object[] { val });
+                bIncreasd = (bool)objRet;
+
+                return bIncreasd;
+            }
+            
+            //要丢给线程执行的方法，本处无返回类型就是为了能让ThreadStart来调用
+            public void ImportProc()
+            {
+                try
+                {
+                    MethodInvoker mi = new MethodInvoker(frm.ShowImportProgressBar);
+                    frm.BeginInvoke(mi);
+
+                    Int32 count = 0; // 记录数目
+                    Int32 error = 0;
+                    Int32 duplicate = 0;
+
+                    Int32 sheetCnt = 0;
+
+                    // 读取excel 数据并保存
+                    using (SEHApplication app = new SEHApplication())
+                    {
+                        //打开Excel工作表
+                        if (app.OpenWorkbook(fileName))
+                        {
+                            int index = 1; // start from 1
+                            Excel.Worksheet worksheet;
+                            DataTable dt = new System.Data.DataTable();
+
+                            sheetCnt = app.GetSheetsCount();
+
+                            while ((worksheet = app.OpenWorksheet(index)) != null)
+                            {
+                                // get data from current sheet
+                                if (index == 1)
+                                {
+                                    for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
+                                        dt.Columns.Add();
+                                }
+
+                                Int32 granuality = sheetCnt * worksheet.Cells.CurrentRegion.Rows.Count / 50;
+
+                                if ((worksheet.Cells.CurrentRegion.Rows.Count <= granuality) || (granuality <= 0))
+                                    progressBarAddVal(50/sheetCnt);
+
+                                for (int r = 2; r <= worksheet.Cells.CurrentRegion.Rows.Count; r++)   //把工作表导入DataTable中
+                                {
+                                    DataRow myRow = dt.NewRow();
+
+                                    for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
+                                    {
+                                        Excel.Range temp = (Excel.Range)worksheet.Cells[r, c];
+                                        string strValue = temp.Text.ToString();
+                                        myRow[c - 1] = strValue;
+                                    }
+                                    dt.Rows.Add(myRow);
+
+                                    if ((granuality != 0) && (r % granuality) == 0)
+                                        progressBarAddVal(1);
+                                }
+
+                                app.CloseSheet(worksheet);
+                                System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
+
+                                index++;
+                            }
+
+                            //关闭工作表
+                            app.CloseWorkbook();
+                            GC.Collect();
+                            GC.WaitForPendingFinalizers();
+
+                            if (dt.Rows.Count > 0)
+                            {
+                                Int32 granuality = 0;
+                                if (dt.Rows.Count > 50)
+                                    granuality = dt.Rows.Count / 50;
+
+                                // 打开mdb
+                                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
+                                {
+                                    con.Open();
+
+                                    for (int i = 0; i < dt.Rows.Count; i++)
+                                    {
+                                        // go through each row and store in database
+                                        if (frm.isRowValueValid(dt.Rows[i], dt.Columns.Count))
+                                        {
+                                            StoreResult res;
+                                            if ((res = frm.storeRowValue2Database(con, dt.Rows[i], dt.Columns.Count)) != StoreResult.RES_SUCCESS)
+                                            {
+                                                if (res == StoreResult.RES_DUPLICATE)
+                                                {
+                                                    duplicate++;
+                                                }
+                                                else if (res == StoreResult.RES_INVALID)
+                                                {
+                                                    error++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                count++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            error++;
+                                        }
+
+                                        // proceed to progressBar
+                                        if (granuality != 0)
+                                        {
+                                            if ((i % granuality) == 0)
+                                                progressBarAddVal(1);
+                                        }
+                                        else
+                                        {
+                                            progressBarAddVal(50/dt.Rows.Count);
+                                        }
+                                    }
+
+                                    con.Close();
+                                }
+                            }
+
+                            progressBarAddVal(100);
+
+                            String msg = String.Format("Insert {0} records into database \r\n\r\n {1} invalid, {2} duplicated records found.", count.ToString(), error.ToString(), duplicate.ToString());
+                            MessageBox.Show(msg, "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Excel打开失败！");
+                        }
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+
         private void buttonImport_Click(object sender, EventArgs e)
         {
             if (curUser.group != userGrp.UG_ADMIN)
@@ -852,103 +1029,10 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 openSysFileDialog.RestoreDirectory = true;
                 if (openSysFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                        Int32 count = 0; // 记录数目
-                        Int32 error = 0;
-                        Int32 duplicate = 0;
 
-                        // 读取excel 数据并保存
-                        using (SEHApplication app = new SEHApplication())
-                        {
-                            //打开Excel工作表
-                            if (app.OpenWorkbook(openSysFileDialog.FileName))
-                            {
-                                int index = 1; // start from 1
-                                Excel.Worksheet worksheet;
-                                DataTable dt = new System.Data.DataTable();
-
-                                while ((worksheet = app.OpenWorksheet(index)) != null)
-                                {
-                                    // get data from current sheet
-                                    if (index == 1)
-                                    {
-                                        for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
-                                            dt.Columns.Add();
-                                    }
-
-                                    for (int r = 2; r <= worksheet.Cells.CurrentRegion.Rows.Count; r++)   //把工作表导入DataTable中
-                                    {
-                                        DataRow myRow = dt.NewRow();
-
-                                        for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
-                                        {
-                                            Excel.Range temp = (Excel.Range)worksheet.Cells[r, c];
-                                            string strValue = temp.Text.ToString();
-                                            myRow[c - 1] = strValue;
-                                        }
-                                        dt.Rows.Add(myRow);
-                                    }
-
-                                    app.CloseSheet(worksheet);
-                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
-
-                                    index++;
-                                }
-
-                                //关闭工作表
-                                app.CloseWorkbook();
-
-                                if (dt.Rows.Count > 0)
-                                {
-                                    // 打开mdb
-                                    using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
-                                    {
-                                        con.Open();
-
-                                        for (int i = 0; i < dt.Rows.Count; i++)
-                                        {
-                                            // go through each row and store in database
-                                            if (isRowValueValid(dt.Rows[i], dt.Columns.Count))
-                                            {
-                                                StoreResult res;
-                                                if ((res = storeRowValue2Database(con, dt.Rows[i], dt.Columns.Count)) != StoreResult.RES_SUCCESS)
-                                                {
-                                                    if (res == StoreResult.RES_DUPLICATE)
-                                                    {
-                                                        duplicate++;
-                                                    }
-                                                    else if (res == StoreResult.RES_INVALID)
-                                                    {
-                                                        error++;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    count++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                error++;
-                                            }
-                                        }
-
-                                        con.Close();
-                                    }
-                                }
-
-                                String msg = String.Format("Insert {0} records into database \r\n\r\n {1} invalid, {2} duplicated records found.", count.ToString(), error.ToString(), duplicate.ToString());
-                                MessageBox.Show(msg, "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            }
-                            else
-                            {
-                                MessageBox.Show("Excel打开失败！");
-                            }
-
-                            //System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
-                        }// End using (SEHApplication app = new SEHApplication())
-
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
+                    ThreadWithParam twp = new ThreadWithParam(openSysFileDialog.FileName, this);
+                    Thread thd = new Thread(new ThreadStart(twp.ImportProc));
+                    thd.Start();
                 } // End if( openSysFileDialog.ShowDialog() == DialogResult.OK)
             }
 
