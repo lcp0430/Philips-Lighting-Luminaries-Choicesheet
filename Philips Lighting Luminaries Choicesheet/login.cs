@@ -33,7 +33,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             }
 
             //验证密码 
-            else if (textBoxUserName.Text == "admin")
+            else if (textBoxUserName.Text != string.Empty)
             {
 
                 if (!File.Exists(iniFilePath))
@@ -42,7 +42,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 StringBuilder temp = new StringBuilder(256);
                 if (GetPrivateProfileString("Admin", "Name", "", temp, 256, iniFilePath) != 0)
                 {
-                    if (temp.ToString() == "admin")
+                    if (temp.ToString() == textBoxUserName.Text)
                     {
                         // Now get the pwd
                         if (GetPrivateProfileString("Admin", "Password", "", temp, 256, iniFilePath) != 0)
@@ -90,6 +90,9 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 labelPwd.Visible = false;
             }
+
+            TextBox tb = (TextBox)sender;
+            tb.SelectAll();
         }
 
         private void textBoxFocusLeave(object sender, EventArgs e)
@@ -104,6 +107,12 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 if(textBoxPwd.Text.Length < 1)
                     labelPwd.Visible = true;
             }
+        }
+
+        private void textBoxPwd_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                button1_Click(sender, e);
         }
     }
 }

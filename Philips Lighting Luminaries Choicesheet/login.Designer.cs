@@ -112,6 +112,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             this.textBoxPwd.Size = new System.Drawing.Size(199, 36);
             this.textBoxPwd.TabIndex = 5;
             this.textBoxPwd.Enter += new System.EventHandler(this.textBoxFocusEnter);
+            this.textBoxPwd.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxPwd_KeyDown);
             this.textBoxPwd.Leave += new System.EventHandler(this.textBoxFocusLeave);
             // 
             // labelUserName

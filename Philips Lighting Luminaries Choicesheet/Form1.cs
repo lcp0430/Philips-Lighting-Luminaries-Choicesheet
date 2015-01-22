@@ -874,6 +874,16 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             //要丢给线程执行的方法，本处无返回类型就是为了能让ThreadStart来调用
             public void ImportProc()
             {
+                string[] sheetColumeName = {"序列号",
+                                     "归档号",
+                                     "ProductFamily",
+                                     "证书编号",
+                                     "状态",
+                                     "Factory",
+                                     "规格/描述1(证书上)",
+                                     "规格/描述2(SAP上)",
+                                     "产品12NC"};
+
                 try
                 {
                     MethodInvoker mi = new MethodInvoker(frm.ShowImportProgressBar);
@@ -884,6 +894,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     Int32 duplicate = 0;
 
                     Int32 sheetCnt = 0;
+                    bool toContinue = true;
 
                     // 读取excel 数据并保存
                     using (SEHApplication app = new SEHApplication())
@@ -900,37 +911,48 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             while ((worksheet = app.OpenWorksheet(index)) != null)
                             {
                                 // get data from current sheet
-                                if (index == 1)
+                                if (index++ == 1)
                                 {
                                     for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
                                         dt.Columns.Add();
                                 }
 
-                                Int32 granuality = sheetCnt * worksheet.Cells.CurrentRegion.Rows.Count / 50;
-
-                                if ((worksheet.Cells.CurrentRegion.Rows.Count <= granuality) || (granuality <= 0))
-                                    progressBarAddVal(50/sheetCnt);
-
-                                for (int r = 2; r <= worksheet.Cells.CurrentRegion.Rows.Count; r++)   //把工作表导入DataTable中
+                                // Check the sheet format, must be in
+                                //"序列号" "归档号" "Product Family" "证书编号" "状态" "Factory" "规格/描述1(证书上)" "规格/描述2(SAP上)" "产品12NC"
+                                for(int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
                                 {
-                                    DataRow myRow = dt.NewRow();
+                                    Excel.Range temp = (Excel.Range)worksheet.Cells[1, c];
+                                    string strv = temp.Text.ToString().Replace(" ", "");
+                                    if (strv != string.Empty && sheetColumeName[c - 1] != strv)
+                                        toContinue = false;
+                                }
 
-                                    for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
+                                if (toContinue)
+                                {
+                                    Int32 granuality = sheetCnt * worksheet.Cells.CurrentRegion.Rows.Count / 50;
+
+                                    if ((worksheet.Cells.CurrentRegion.Rows.Count <= granuality) || (granuality <= 0))
+                                        progressBarAddVal(50 / sheetCnt);
+
+                                    for (int r = 2; r <= worksheet.Cells.CurrentRegion.Rows.Count; r++)   //把工作表导入DataTable中
                                     {
-                                        Excel.Range temp = (Excel.Range)worksheet.Cells[r, c];
-                                        string strValue = temp.Text.ToString();
-                                        myRow[c - 1] = strValue;
-                                    }
-                                    dt.Rows.Add(myRow);
+                                        DataRow myRow = dt.NewRow();
 
-                                    if ((granuality != 0) && (r % granuality) == 0)
-                                        progressBarAddVal(1);
+                                        for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
+                                        {
+                                            Excel.Range temp = (Excel.Range)worksheet.Cells[r, c];
+                                            string strValue = temp.Text.ToString();
+                                            myRow[c - 1] = strValue;
+                                        }
+                                        dt.Rows.Add(myRow);
+
+                                        if ((granuality != 0) && (r % granuality) == 0)
+                                            progressBarAddVal(1);
+                                    }
                                 }
 
                                 app.CloseSheet(worksheet);
                                 System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
-
-                                index++;
                             }
 
                             //关闭工作表
@@ -938,7 +960,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             GC.Collect();
                             GC.WaitForPendingFinalizers();
 
-                            if (dt.Rows.Count > 0)
+                            if (toContinue && (dt.Rows.Count > 0))
                             {
                                 Int32 granuality = 0;
                                 if (dt.Rows.Count > 50)
@@ -994,7 +1016,16 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
                             progressBarAddVal(100);
 
-                            String msg = String.Format("Insert {0} records into database \r\n\r\n {1} invalid, {2} duplicated records found.", count.ToString(), error.ToString(), duplicate.ToString());
+                            String msg;
+                            if (toContinue)
+                                msg = String.Format("Insert {0} records into database \r\n\r\n {1} invalid, {2} duplicated records found.", count.ToString(), error.ToString(), duplicate.ToString());
+                            else
+                            {
+                                msg = String.Format("Please Check Excel Format. The columns in sheet should be:\r\n\r\n");
+                                for(int i=0; i<9; i++)
+                                    msg += String.Format("{0}\r\n", sheetColumeName[i]);
+                            }
+
                             MessageBox.Show(msg, "Confirm", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
