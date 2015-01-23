@@ -57,6 +57,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 if (!Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
                 {
                     this.dgvProduct.Rows[r].ReadOnly = false;
+                    this.dgvProduct.Rows[r].DefaultCellStyle.BackColor = SystemColors.Control;
                 }
             }
 
@@ -90,6 +91,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 if (!Convert.ToBoolean(this.dgvProduct.Rows[r].Cells[0].Value))
                 {
                     this.dgvProduct.Rows[r].ReadOnly = true;
+                    this.dgvProduct.Rows[r].DefaultCellStyle.BackColor = Color.DarkGray;
                 }
             }
         }
@@ -1053,7 +1055,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 //设置打开文件对话框属性
                 OpenFileDialog openSysFileDialog = new OpenFileDialog();
                 openSysFileDialog.FileName = "";
-                openSysFileDialog.Filter = "Excel files(*.xlsx)|*.xlsx|All files(*.*)|*.*";
+                openSysFileDialog.Filter = "Excel files(*.xls)|*.xls|All files(*.*)|*.*";
                 openSysFileDialog.CheckFileExists = true;
                 openSysFileDialog.CheckPathExists = true;
                 openSysFileDialog.FilterIndex = 0;
@@ -1076,6 +1078,12 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         private void StatusUpdateTimerOnTick()
         {
 
+        }
+
+        private void SearchNumber_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                button1_Click(sender, e);
         }
     }
 }
