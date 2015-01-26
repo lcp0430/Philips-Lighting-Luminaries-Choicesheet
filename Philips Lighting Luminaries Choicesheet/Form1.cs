@@ -422,17 +422,31 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 if (curUser.group != userGrp.UG_ADMIN)
                     return;
 
+                bool continueDelete = false;
+                int pcs = 0;
                 string eraseItem = "";
+                int totalCnt = 0;
                 List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
+
                 foreach (DataGridViewRow cc in this.dgvProduct.Rows)
                 {
                     if (Convert.ToBoolean(cc.Cells[0].Value))
                     {
-                        eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                        if ((pcs < 100) && (!continueDelete))
+                        {// can delete 100 items per time
+                            eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                            pcs++;
+                        }
+                        else
+                        {
+                            continueDelete = true;
+                        }
+                            
                         targetRows.Add(cc);
                     }
                 }
 
+                totalCnt = targetRows.Count;
                 string msg = String.Format("选择了 {0} 条记录，确定要删除吗？", targetRows.Count.ToString());
                 if(MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
                 {
@@ -441,10 +455,46 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                         eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
                         if (Operate(eraseItem))
                         {
+                            int t = pcs - 1;
+                            while(t >= 0){
+                                this.dgvProduct.Rows.Remove(targetRows[t]);
+                                t--;
+                            }
+
+                            targetRows.RemoveRange(0, pcs);
+                        }
+                    }
+
+                    totalCnt -= pcs;
+
+                    if(continueDelete)
+                    {
+                        // all the item in the targetRows should be deleted
+                        while (totalCnt > 0)
+                        {
+                            eraseItem = "";
+                            pcs = 0;
                             foreach (DataGridViewRow cc in targetRows)
                             {
-                                this.dgvProduct.Rows.Remove(cc);
+                                eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                                if (++pcs >= 100)
+                                    break;
                             }
+
+                            eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
+                            if (Operate(eraseItem))
+                            {
+                                int t = pcs - 1;
+                                while (t >= 0)
+                                {
+                                    this.dgvProduct.Rows.Remove(targetRows[t]);
+                                    t--;
+                                }
+
+                                targetRows.RemoveRange(0, pcs);
+                            }
+
+                            totalCnt -= pcs;
                         }
                     }
                 }
