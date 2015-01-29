@@ -280,6 +280,7 @@
             this.Name = "Form1";
             this.Text = "Philips Lighting Luminaries Choicesheet";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Shown += new System.EventHandler(this.Form1_Shown);
             this.gbSearch.ResumeLayout(false);
             this.gbSearch.PerformLayout();
             this.groupBox2.ResumeLayout(false);

@@ -9,6 +9,10 @@ using System.Data.OleDb;
 using Excel = Microsoft.Office.Interop.Excel;
 using SimpleExcelHelper;
 using System.Threading;
+using System.IO;
+using System.Collections;
+using System.Diagnostics;
+using System.Net;
 
 namespace Philips_Lighting_Luminaries_Choicesheet
 {
@@ -42,6 +46,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         }
 
         public userInfo curUser = new userInfo();
+
+        private BackgroundWorker worker = null;
 
         public Form1()
         {
@@ -113,6 +119,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     OleDbDataAdapter da = new OleDbDataAdapter(cmdtext, con);
                     da.Fill(ds); //对ds添加数据
                     this.dgvProduct.DataSource = ds.Tables[0].DefaultView;
+                    this.dgvProduct.Sort(this.dgvProduct.Columns[1], ListSortDirection.Ascending);
                 }
 
                 DisableUserEditContent(this.dgvProduct);
@@ -383,6 +390,151 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             return result;
         }
 
+        private void worker_DoDeletion(object sender, DoWorkEventArgs e)
+        {
+            DataGridView dgv = e.Argument as DataGridView;
+
+            bool continueDelete = false;
+            int pcs = 0;
+            string eraseItem = "";
+            int totalCnt = 0;
+            int totalCntBack = 0;
+            List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
+
+            foreach (DataGridViewRow cc in dgv.Rows)
+            {
+                if (Convert.ToBoolean(cc.Cells[0].Value))
+                {
+                    if ((pcs < 50) && (!continueDelete))
+                    {// can delete 50 items per time
+                        eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                        pcs++;
+                    }
+                    else
+                    {
+                        continueDelete = true;
+                    }
+
+                    targetRows.Add(cc);
+                }
+            }
+
+            totalCnt = targetRows.Count;
+            totalCntBack = totalCnt;
+
+            if (!String.IsNullOrEmpty(eraseItem))
+            {
+                eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
+                if (Operate(eraseItem))
+                {
+                    //int t = pcs - 1;
+                    //while (t >= 0)
+                    //{
+                    //    dgv.Rows.Remove(targetRows[t]);
+                    //    t--;
+                    //}
+
+                    targetRows.RemoveRange(0, pcs);
+                    worker.ReportProgress(pcs);
+                }
+            }
+
+            totalCnt -= pcs;
+
+            if (continueDelete)
+            {
+                // all the item in the targetRows should be deleted
+                while (totalCnt > 0)
+                {
+                    eraseItem = "";
+                    pcs = 0;
+                    foreach (DataGridViewRow cc in targetRows)
+                    {
+                        eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                        if (++pcs >= 50)
+                            break;
+                    }
+
+                    eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
+                    if (Operate(eraseItem))
+                    {
+                        //int t = pcs - 1;
+                        //while (t >= 0)
+                        //{
+                        //    dgv.Rows.Remove(targetRows[t]);
+                        //    t--;
+                        //}
+
+                        targetRows.RemoveRange(0, pcs);
+                        worker.ReportProgress(pcs);
+                    }
+
+                    totalCnt -= pcs;
+                }
+            }
+        }
+
+        private void worker_DeleteProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //delete it from dgv
+            int done = e.ProgressPercentage;
+
+            int t = done - 1;
+            while (t >= 0)
+            {
+                this.dgvProduct.Rows.RemoveAt(t);
+                t--;
+            }
+
+            if (this.dgvProduct.Rows.Count == 0)
+            {
+                // no rows in current view
+                this.btnDelete.Enabled = false;
+                this.btnAdd.Text = "添加";
+            }
+        }
+
+        private void doBtnDelete(object sender, EventArgs e, Int32 max)
+        {
+            try
+            {
+                //Show the progress bar
+                progressBar progressForm = new progressBar(max);
+                progressForm.Show();
+
+                // Prepare the background worker for asynchronous prime number calculation
+                worker = new BackgroundWorker();
+                // Specify that the background worker provides progress notifications            
+                worker.WorkerReportsProgress = true;
+                // Specify that the background worker supports cancellation
+                worker.WorkerSupportsCancellation = false;
+                // The DoWork event handler is the main work function of the background thread
+                worker.DoWork += new DoWorkEventHandler(worker_DoDeletion);
+                // Specify the function to use to handle progress
+                worker.ProgressChanged += new ProgressChangedEventHandler(worker_DeleteProgressChanged);
+                worker.ProgressChanged += new ProgressChangedEventHandler(progressForm.OnProgressChanged);
+                // Specify the function to run when the background worker finishes
+                // There are three conditions possible that should be handled in this function:
+                // 1. The work completed successfully
+                // 2. The work aborted with errors
+                // 3. The user cancelled the process
+                //worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(worker_RunWorkerCompleted);
+                worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(progressForm.OnProcessCompleted);
+
+                //If your background operation requires a parameter, 
+                //call System.ComponentModel.BackgroundWorker.RunWorkerAsync 
+                //with your parameter. Inside the System.ComponentModel.BackgroundWorker.DoWork 
+                //event handler, you can extract the parameter from the 
+                //System.ComponentModel.DoWorkEventArgs.Argument property.
+                worker.RunWorkerAsync(this.dgvProduct);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
         private void btnDelete_Click(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
@@ -422,89 +574,18 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 if (curUser.group != userGrp.UG_ADMIN)
                     return;
 
-                bool continueDelete = false;
-                int pcs = 0;
-                string eraseItem = "";
-                int totalCnt = 0;
-                List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
-
+                Int32 cnt = 0;
                 foreach (DataGridViewRow cc in this.dgvProduct.Rows)
                 {
                     if (Convert.ToBoolean(cc.Cells[0].Value))
                     {
-                        if ((pcs < 100) && (!continueDelete))
-                        {// can delete 100 items per time
-                            eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
-                            pcs++;
-                        }
-                        else
-                        {
-                            continueDelete = true;
-                        }
-                            
-                        targetRows.Add(cc);
+                        cnt++;
                     }
                 }
 
-                totalCnt = targetRows.Count;
-                string msg = String.Format("选择了 {0} 条记录，确定要删除吗？", targetRows.Count.ToString());
-                if(MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
-                {
-                    if (!String.IsNullOrEmpty(eraseItem))
-                    {
-                        eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
-                        if (Operate(eraseItem))
-                        {
-                            int t = pcs - 1;
-                            while(t >= 0){
-                                this.dgvProduct.Rows.Remove(targetRows[t]);
-                                t--;
-                            }
-
-                            targetRows.RemoveRange(0, pcs);
-                        }
-                    }
-
-                    totalCnt -= pcs;
-
-                    if(continueDelete)
-                    {
-                        // all the item in the targetRows should be deleted
-                        while (totalCnt > 0)
-                        {
-                            eraseItem = "";
-                            pcs = 0;
-                            foreach (DataGridViewRow cc in targetRows)
-                            {
-                                eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
-                                if (++pcs >= 100)
-                                    break;
-                            }
-
-                            eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
-                            if (Operate(eraseItem))
-                            {
-                                int t = pcs - 1;
-                                while (t >= 0)
-                                {
-                                    this.dgvProduct.Rows.Remove(targetRows[t]);
-                                    t--;
-                                }
-
-                                targetRows.RemoveRange(0, pcs);
-                            }
-
-                            totalCnt -= pcs;
-                        }
-                    }
-                }
-
-                if (this.dgvProduct.Rows.Count == 0)
-                {
-                    // no rows in current view
-                    this.btnDelete.Enabled = false;
-                    this.btnAdd.Text = "添加";
-                }
+                string msg = String.Format("选择了 {0} 条记录，确定要删除吗？", cnt.ToString());
+                if (MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
+                    doBtnDelete(sender, e, cnt);
 
             }
             else
@@ -888,13 +969,13 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             return res;
         }
 
-        private import myProcessBar = null;
+        private progressBar myProcessBar = null;
         private delegate bool IncreaseHandle(int nValue);
         private IncreaseHandle myIncrease = null;
 
         private void ShowImportProgressBar()
         {
-            myProcessBar = new import();
+            myProcessBar = new progressBar(0);
             myIncrease = new IncreaseHandle(myProcessBar.increase);
             myProcessBar.ShowDialog();
             myProcessBar = null;
@@ -1134,6 +1215,11 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         {
             if (e.KeyCode == Keys.Enter)
                 button1_Click(sender, e);
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            Process.Start("AutoUpdate.exe", Application.ProductName.Replace(" ", ""));
         }
     }
 }
