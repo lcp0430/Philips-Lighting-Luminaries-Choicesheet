@@ -393,6 +393,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         private void worker_DoDeletion(object sender, DoWorkEventArgs e)
         {
             DataGridView dgv = e.Argument as DataGridView;
+            const int linesPerOperation = 100;
 
             bool continueDelete = false;
             int pcs = 0;
@@ -405,8 +406,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 if (Convert.ToBoolean(cc.Cells[0].Value))
                 {
-                    if ((pcs < 50) && (!continueDelete))
-                    {// can delete 50 items per time
+                    if ((pcs < linesPerOperation) && (!continueDelete))
+                    {// can delete linesPerOperation items per time
                         eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
                         pcs++;
                     }
@@ -451,7 +452,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     foreach (DataGridViewRow cc in targetRows)
                     {
                         eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
-                        if (++pcs >= 50)
+                        if (++pcs >= linesPerOperation)
                             break;
                     }
 
@@ -470,6 +471,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     }
 
                     totalCnt -= pcs;
+
+                    Thread.Sleep(50);
                 }
             }
         }
@@ -492,6 +495,54 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 this.btnDelete.Enabled = false;
                 this.btnAdd.Text = "添加";
             }
+        }
+
+        private bool DeleteProgressChanged(int val)
+        {
+            //delete it from dgv
+            //int t = val - 1;
+            //while (t >= 0)
+            //{
+            //    this.dgvProduct.Rows.RemoveAt(t);
+            //    t--;
+            //}
+
+            /*
+            int cnt = 0;
+            List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
+
+            foreach (DataGridViewRow cc in this.dgvProduct.Rows)
+            {
+                if (Convert.ToBoolean(cc.Cells[0].Value))
+                {
+                    cnt++;
+                    targetRows.Add(cc);
+
+                    if (cnt > val)
+                        break;
+                }
+            }
+
+            if (targetRows.Count > 0)
+            {
+                foreach (DataGridViewRow cc in targetRows)
+                {
+                    this.dgvProduct.Rows.Remove(cc);
+                }
+            }
+
+             */
+
+            this.button1_Click(null, null);
+
+            if (this.dgvProduct.Rows.Count == 0)
+            {
+                // no rows in current view
+                this.btnDelete.Enabled = false;
+                this.btnAdd.Text = "添加";
+            }
+
+            return true;
         }
 
         private void doBtnDelete(object sender, EventArgs e, Int32 max)
@@ -585,7 +636,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
 
                 string msg = String.Format("选择了 {0} 条记录，确定要删除吗？", cnt.ToString());
                 if (MessageBox.Show(msg, "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
-                    doBtnDelete(sender, e, cnt);
+                {
+                    //doBtnDelete(sender, e, cnt); //暂时不用BackGroundWork的方法,代码保留
+
+                    ThreadWithParam twp = new ThreadWithParam("", this);
+                    Thread thd = new Thread(new ThreadStart(twp.DeleteProc));
+                    thd.Start();
+                }
+                    
 
             }
             else
@@ -972,11 +1030,13 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         private progressBar myProcessBar = null;
         private delegate bool IncreaseHandle(int nValue);
         private IncreaseHandle myIncrease = null;
+        private IncreaseHandle myDgvUpdate = null;
 
         private void ShowImportProgressBar()
         {
             myProcessBar = new progressBar(0);
             myIncrease = new IncreaseHandle(myProcessBar.increase);
+            myDgvUpdate = new IncreaseHandle(this.DeleteProgressChanged);
             myProcessBar.ShowDialog();
             myProcessBar = null;
         }
@@ -1002,6 +1062,107 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 bIncreasd = (bool)objRet;
 
                 return bIncreasd;
+            }
+
+            private bool mainFrmDgvDelete(int val)
+            {
+                //delete it from dgv
+                bool bIncreasd = false;
+                object objRet = null;
+
+                objRet = frm.Invoke(frm.myDgvUpdate, new object[] { val });
+                bIncreasd = (bool)objRet;
+
+                return bIncreasd;
+            }
+
+            public void DeleteProc()
+            {
+                try
+                {
+                    MethodInvoker mi = new MethodInvoker(frm.ShowImportProgressBar);
+                    frm.BeginInvoke(mi);
+
+                    const int linesPerOperation = 100;
+
+                    bool continueDelete = false;
+                    int pcs = 0;
+                    string eraseItem = "";
+                    int totalCnt = 0;
+                    int totalCntBack = 0;
+                    List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
+
+                    foreach (DataGridViewRow cc in frm.dgvProduct.Rows)
+                    {
+                        if (Convert.ToBoolean(cc.Cells[0].Value))
+                        {
+                            if ((pcs < linesPerOperation) && (!continueDelete))
+                            {// can delete linesPerOperation items per time
+                                eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                                pcs++;
+                            }
+                            else
+                            {
+                                continueDelete = true;
+                            }
+
+                            targetRows.Add(cc);
+                        }
+                    }
+
+                    totalCnt = targetRows.Count;
+                    totalCntBack = totalCnt;
+
+                    if (!String.IsNullOrEmpty(eraseItem))
+                    {
+                        eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
+                        if (frm.Operate(eraseItem))
+                        {
+                            targetRows.RemoveRange(0, pcs);
+                            //worker.ReportProgress(pcs);
+                            progressBarAddVal(100 * pcs / totalCntBack);
+                            //mainFrmDgvDelete(pcs);
+                        }
+                    }
+
+                    totalCnt -= pcs;
+
+                    if (continueDelete)
+                    {
+                        // all the item in the targetRows should be deleted
+                        while (totalCnt > 0)
+                        {
+                            eraseItem = "";
+                            pcs = 0;
+                            foreach (DataGridViewRow cc in targetRows)
+                            {
+                                eraseItem += String.Format("{0}={1} or ", INDEX, cc.Cells[INDEX].Value);
+                                if (++pcs >= linesPerOperation)
+                                    break;
+                            }
+
+                            eraseItem = String.Format("delete from [{0}] where {1}", PRODUCT, eraseItem.Remove(eraseItem.Length - 4, 4));
+                            if (frm.Operate(eraseItem))
+                            {
+                                targetRows.RemoveRange(0, pcs);
+                                //worker.ReportProgress(pcs);
+                                progressBarAddVal(100 * pcs / totalCntBack);
+                                //mainFrmDgvDelete(pcs);
+                            }
+
+                            totalCnt -= pcs;
+
+                            Thread.Sleep(50);
+                        }
+                    }
+                    progressBarAddVal(100);
+                    mainFrmDgvDelete(100);
+                }
+
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
             }
             
             //要丢给线程执行的方法，本处无返回类型就是为了能让ThreadStart来调用

@@ -3,7 +3,7 @@
   <description>Application autoUpdate</description>
   <Updater>
 	<Url>http://qq000cnu4129bbr/ChoiceSheetUpdate/</Url>
-	<LastUpdateTime>2015-01-28</LastUpdateTime>
+	<LastUpdateTime>2015-01-30</LastUpdateTime>
   </Updater>
   <Application applicationId="philips">
     <EntryPoint>Philips Lighting Luminaries Choicesheet.exe</EntryPoint>
@@ -11,9 +11,12 @@
     <Version>1.0.0.0</Version>
   </Application>
   <Files>
-	   <File Ver="1.0.0.0" Name="SimpleExcelHelper.dll" />
-	   <File Ver="1.0.0.0" Name="Philips Lighting Luminaries Choicesheet.exe"/>
-	   <File Ver="1.0.0.0" Name="conf.ini"/>
+           <File Ver="1.0.0.0" Name="AutoUpdate.exe" />
+           <File Ver="1.0.0.0" Name="conf.ini"/>
+           <File Ver="1.0.0.0" Name="History.txt" />
+           <File Ver="1.0.0.1" Name="Philips Lighting Luminaries Choicesheet.exe"/>
            <File Ver="1.0.0.0" Name="products.mdb"/>
+	   <File Ver="1.0.0.0" Name="SimpleExcelHelper.dll" />
+           <File Ver="1.0.0.1" Name="Version.xml" />
   </Files>
 </AutoUpdater>
