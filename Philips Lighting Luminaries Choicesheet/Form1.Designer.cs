@@ -35,6 +35,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.gbSearch = new System.Windows.Forms.GroupBox();
+            this.indicator = new System.Windows.Forms.Label();
             this.SearchNumber = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.SelectItems = new System.Windows.Forms.ComboBox();
@@ -58,6 +59,7 @@
             // 
             // gbSearch
             // 
+            this.gbSearch.Controls.Add(this.indicator);
             this.gbSearch.Controls.Add(this.SearchNumber);
             this.gbSearch.Controls.Add(this.button1);
             this.gbSearch.Controls.Add(this.SelectItems);
@@ -69,6 +71,17 @@
             this.gbSearch.TabIndex = 6;
             this.gbSearch.TabStop = false;
             this.gbSearch.Text = "Search";
+            // 
+            // indicator
+            // 
+            this.indicator.AutoSize = true;
+            this.indicator.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.indicator.ForeColor = System.Drawing.Color.Red;
+            this.indicator.Location = new System.Drawing.Point(39, 57);
+            this.indicator.Name = "indicator";
+            this.indicator.Size = new System.Drawing.Size(158, 25);
+            this.indicator.TabIndex = 7;
+            this.indicator.Text = "读取数据库错误!";
             // 
             // SearchNumber
             // 
@@ -193,7 +206,6 @@
             // 
             // dgvProduct
             // 
-            this.dgvProduct.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dgvProduct.BackgroundColor = System.Drawing.SystemColors.Control;
             dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
@@ -203,7 +215,6 @@
             dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dgvProduct.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this.dgvProduct.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvProduct.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
             dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
@@ -310,6 +321,7 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Timer timerStatusBar;
+        private System.Windows.Forms.Label indicator;
     }
 }
 

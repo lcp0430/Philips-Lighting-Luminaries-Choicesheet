@@ -497,43 +497,15 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             }
         }
 
-        private bool DeleteProgressChanged(int val)
+        private bool DeleteRefresh(int val)
         {
-            //delete it from dgv
-            //int t = val - 1;
-            //while (t >= 0)
-            //{
-            //    this.dgvProduct.Rows.RemoveAt(t);
-            //    t--;
-            //}
-
-            /*
-            int cnt = 0;
-            List<DataGridViewRow> targetRows = new List<DataGridViewRow>();
-
-            foreach (DataGridViewRow cc in this.dgvProduct.Rows)
-            {
-                if (Convert.ToBoolean(cc.Cells[0].Value))
-                {
-                    cnt++;
-                    targetRows.Add(cc);
-
-                    if (cnt > val)
-                        break;
-                }
-            }
-
-            if (targetRows.Count > 0)
-            {
-                foreach (DataGridViewRow cc in targetRows)
-                {
-                    this.dgvProduct.Rows.Remove(cc);
-                }
-            }
-
-             */
-
             this.button1_Click(null, null);
+            return true;
+        }
+
+        private bool dgvUpdate(int val)
+        {
+            //this.button1_Click(null, null);
 
             if (this.dgvProduct.Rows.Count == 0)
             {
@@ -541,6 +513,15 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 this.btnDelete.Enabled = false;
                 this.btnAdd.Text = "添加";
             }
+
+            // update the max index 
+            Int32 max = GetMaxid();
+            if (max != -1)
+            {
+                this.indicator.Text = "当前最大索引: " + max.ToString();
+                this.indicator.ForeColor = SystemColors.ControlText;
+                this.indicator.Update();
+            } 
 
             return true;
         }
@@ -694,6 +675,36 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             return result;
         }
 
+        private int GetMaxid()
+        { 
+            int id = -1;
+
+            try
+            {
+                using (OleDbConnection con = new OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data source=products.mdb;Jet OleDb:DataBase Password=Philips2"))
+                {
+                    con.Open();
+
+                    OleDbCommand cmd = new OleDbCommand("select max(序列号) from Product", con);
+                    if (cmd.ExecuteScalar() == DBNull.Value)
+                        id = 0;
+                    else
+                        id = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    con.Close();
+                }
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+
+            }
+
+            return id;
+
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             Form f2 = new login(this);
@@ -704,6 +715,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 _firstColVisible = false;
                 this.btnDelete.Enabled = _firstColVisible; //删除键不可用
                 this.SelectItems.SelectedIndex = 0;
+
+                // update the max index 
+                Int32 max = GetMaxid();
+                if (max != -1)
+                {
+                    this.indicator.Text = "当前最大索引: " + max.ToString();
+                    this.indicator.ForeColor = SystemColors.ControlText;
+                }   
             }
             else
                 this.Close();
@@ -789,8 +808,10 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         {
             if (this.SearchNumber.Text != string.Empty)
             {
+                this.dgvProduct.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
                 this.Column1.Visible = true;
                 SearchProduct(this.SelectItems.SelectedItem.ToString(), this.SearchNumber.Text.ToString());
+                this.dgvProduct.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
             }
         }
 
@@ -1031,12 +1052,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
         private delegate bool IncreaseHandle(int nValue);
         private IncreaseHandle myIncrease = null;
         private IncreaseHandle myDgvUpdate = null;
+        private IncreaseHandle myDeletionRetrig = null;
 
         private void ShowImportProgressBar()
         {
             myProcessBar = new progressBar(0);
             myIncrease = new IncreaseHandle(myProcessBar.increase);
-            myDgvUpdate = new IncreaseHandle(this.DeleteProgressChanged);
+            myDgvUpdate = new IncreaseHandle(this.dgvUpdate);
+            myDeletionRetrig = new IncreaseHandle(this.DeleteRefresh);
             myProcessBar.ShowDialog();
             myProcessBar = null;
         }
@@ -1064,13 +1087,25 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 return bIncreasd;
             }
 
-            private bool mainFrmDgvDelete(int val)
+            private bool mainFrmDgvUpdate(int val)
             {
                 //delete it from dgv
                 bool bIncreasd = false;
                 object objRet = null;
 
                 objRet = frm.Invoke(frm.myDgvUpdate, new object[] { val });
+                bIncreasd = (bool)objRet;
+
+                return bIncreasd;
+            }
+
+            private bool mainFrmDeleteRetrig(int val)
+            {
+                //delete it from dgv
+                bool bIncreasd = false;
+                object objRet = null;
+
+                objRet = frm.Invoke(frm.myDeletionRetrig, new object[] { val });
                 bIncreasd = (bool)objRet;
 
                 return bIncreasd;
@@ -1121,7 +1156,6 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             targetRows.RemoveRange(0, pcs);
                             //worker.ReportProgress(pcs);
                             progressBarAddVal(100 * pcs / totalCntBack);
-                            //mainFrmDgvDelete(pcs);
                         }
                     }
 
@@ -1147,7 +1181,6 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                 targetRows.RemoveRange(0, pcs);
                                 //worker.ReportProgress(pcs);
                                 progressBarAddVal(100 * pcs / totalCntBack);
-                                //mainFrmDgvDelete(pcs);
                             }
 
                             totalCnt -= pcs;
@@ -1156,7 +1189,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                         }
                     }
                     progressBarAddVal(100);
-                    mainFrmDgvDelete(100);
+                    mainFrmDeleteRetrig(100);
+                    mainFrmDgvUpdate(100);
                 }
 
                 catch(Exception ex)
@@ -1309,6 +1343,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             }
 
                             progressBarAddVal(100);
+                            mainFrmDgvUpdate(100);
 
                             String msg;
                             if (toContinue)
