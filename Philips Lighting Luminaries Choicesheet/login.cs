@@ -114,5 +114,23 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             if (e.KeyCode == Keys.Enter)
                 button1_Click(sender, e);
         }
+
+        private void login_Load(object sender, EventArgs e)
+        {
+            string iniFilePath = Application.StartupPath + @"\conf.ini";
+
+            if (!File.Exists(iniFilePath))
+            {
+                Application.Exit();
+                return;
+            }
+
+            StringBuilder temp = new StringBuilder(256);
+            if (GetPrivateProfileString("Admin", "Caption", "", temp, 256, iniFilePath) != 0)
+            {
+                this.Text += " / ";
+                this.Text += temp.ToString();
+            }
+        }
     }
 }

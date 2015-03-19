@@ -165,6 +165,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     this.dgvProduct.Columns.Add("序列号", "序列号");
                     this.dgvProduct.Columns.Add("归档号", "归档号");
                     this.dgvProduct.Columns.Add("ProductFamily", "ProductFamily");
+                    this.dgvProduct.Columns.Add("GroupLeader", "GroupLeader");
                     this.dgvProduct.Columns.Add(CET_NO, CET_NO);
                     this.dgvProduct.Columns.Add("状态", "状态");
                     this.dgvProduct.Columns.Add("Factory", "Factory");
@@ -209,6 +210,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     this.btnInverseAll.Enabled = true;
                     this.buttonImport.Enabled = true;
                     this.Column1.Visible = false;
+
+                    this.dgvUpdate(0);
                 }
                     
             }
@@ -347,7 +350,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             if (ignoreIndex)
                             {
                                 // this is update db
-                                insertItem = String.Format("update {0} set [归档号]='{1}', [ProductFamily]='{2}', [证书编号]='{3}', [状态]='{4}', [Factory]='{5}', [规格/描述1(证书上)]='{6}', [规格/描述2(SAP上)]='{7}', [产品12NC]='{8}'",
+                                insertItem = String.Format("update {0} set [归档号]='{1}', [ProductFamily]='{2}', [GroupLeader]='{3}', [证书编号]='{4}', [状态]='{5}', [Factory]='{6}', [规格/描述1(证书上)]='{7}', [规格/描述2(SAP上)]='{8}', [产品12NC]='{9}'",
                                     PRODUCT,
                                     cc.Cells[2].Value.ToString(),
                                     cc.Cells[3].Value.ToString(),
@@ -356,7 +359,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                     cc.Cells[6].Value.ToString(),
                                     cc.Cells[7].Value.ToString(),
                                     cc.Cells[8].Value.ToString(),
-                                    cc.Cells[9].Value.ToString());
+                                    cc.Cells[9].Value.ToString(),
+                                    cc.Cells[10].Value.ToString());
                                 insertItem += String.Format(" WHERE [{0}]={1}", INDEX, cc.Cells[1].Value.ToString());
 
                             }
@@ -1205,6 +1209,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 string[] sheetColumeName = {"序列号",
                                      "归档号",
                                      "ProductFamily",
+                                     "GroupLeader",
                                      "证书编号",
                                      "状态",
                                      "Factory",
@@ -1246,7 +1251,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                 }
 
                                 // Check the sheet format, must be in
-                                //"序列号" "归档号" "Product Family" "证书编号" "状态" "Factory" "规格/描述1(证书上)" "规格/描述2(SAP上)" "产品12NC"
+                                //"序列号" "归档号" "Product Family" "Group Leader" "证书编号" "状态" "Factory" "规格/描述1(证书上)" "规格/描述2(SAP上)" "产品12NC"
                                 for(int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
                                 {
                                     Excel.Range temp = (Excel.Range)worksheet.Cells[1, c];
@@ -1351,7 +1356,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             else
                             {
                                 msg = String.Format("Please Check Excel Format. The columns in sheet should be:\r\n\r\n");
-                                for(int i=0; i<9; i++)
+                                for (int i = 0; i < sheetColumeName.Length; i++)
                                     msg += String.Format("{0}\r\n", sheetColumeName[i]);
                             }
 

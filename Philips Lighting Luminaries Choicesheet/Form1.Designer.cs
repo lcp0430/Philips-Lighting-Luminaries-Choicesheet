@@ -113,6 +113,7 @@
             "序列号",
             "归档号",
             "ProductFamily",
+            "GroupLeader",
             "证书编号",
             "状态",
             "Factory",
