@@ -112,14 +112,13 @@
             this.SelectItems.Items.AddRange(new object[] {
             "序列号",
             "归档号",
-            "ProductFamily",
             "GroupLeader",
             "证书编号",
             "状态",
-            "Factory",
             "规格/描述1(证书上)",
             "规格/描述2(SAP上)",
-            "产品12NC"});
+            "产品12NC",
+            "Factory"});
             this.SelectItems.Location = new System.Drawing.Point(417, 61);
             this.SelectItems.Margin = new System.Windows.Forms.Padding(4);
             this.SelectItems.Name = "SelectItems";

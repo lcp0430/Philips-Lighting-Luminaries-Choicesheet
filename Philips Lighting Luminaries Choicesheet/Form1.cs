@@ -70,13 +70,15 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             g.Columns[0].ReadOnly = false;
             g.Columns["序列号"].ReadOnly = true;
             g.Columns["归档号"].ReadOnly = true;
-            g.Columns["ProductFamily"].ReadOnly = true;
+            g.Columns["GroupLeader"].ReadOnly = true;
+            //g.Columns["ProductFamily"].ReadOnly = true;
             g.Columns["证书编号"].ReadOnly = true;
             g.Columns["状态"].ReadOnly = true;
-            g.Columns["Factory"].ReadOnly = true;
             g.Columns["规格/描述1(证书上)"].ReadOnly = true;
             g.Columns["规格/描述2(SAP上)"].ReadOnly = true;
             g.Columns["产品12NC"].ReadOnly = true;
+            g.Columns["Factory"].ReadOnly = true;
+            
         }
 
         private void EnableUserEditContent(DataGridView g)
@@ -84,13 +86,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             g.Columns[0].ReadOnly = true;
             g.Columns["序列号"].ReadOnly = false;
             g.Columns["归档号"].ReadOnly = false;
-            g.Columns["ProductFamily"].ReadOnly = false;
+            //g.Columns["ProductFamily"].ReadOnly = false;
+            g.Columns["GroupLeader"].ReadOnly = false;
             g.Columns["证书编号"].ReadOnly = false;
             g.Columns["状态"].ReadOnly = false;
-            g.Columns["Factory"].ReadOnly = false;
             g.Columns["规格/描述1(证书上)"].ReadOnly = false;
             g.Columns["规格/描述2(SAP上)"].ReadOnly = false;
             g.Columns["产品12NC"].ReadOnly = false;
+            g.Columns["Factory"].ReadOnly = false;
 
             for (int r = 0; r < this.dgvProduct.Rows.Count; r++)
             {
@@ -164,14 +167,14 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                 {
                     this.dgvProduct.Columns.Add("序列号", "序列号");
                     this.dgvProduct.Columns.Add("归档号", "归档号");
-                    this.dgvProduct.Columns.Add("ProductFamily", "ProductFamily");
+                    //this.dgvProduct.Columns.Add("ProductFamily", "ProductFamily");
                     this.dgvProduct.Columns.Add("GroupLeader", "GroupLeader");
                     this.dgvProduct.Columns.Add(CET_NO, CET_NO);
                     this.dgvProduct.Columns.Add("状态", "状态");
-                    this.dgvProduct.Columns.Add("Factory", "Factory");
                     this.dgvProduct.Columns.Add("规格/描述1(证书上)", "规格/描述1(证书上)");
                     this.dgvProduct.Columns.Add("规格/描述2(SAP上)", "规格/描述2(SAP上)");
                     this.dgvProduct.Columns.Add(PRI_KEY, PRI_KEY);
+                    this.dgvProduct.Columns.Add("Factory", "Factory");
                 }
                 else
                 {
@@ -350,7 +353,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                             if (ignoreIndex)
                             {
                                 // this is update db
-                                insertItem = String.Format("update {0} set [归档号]='{1}', [ProductFamily]='{2}', [GroupLeader]='{3}', [证书编号]='{4}', [状态]='{5}', [Factory]='{6}', [规格/描述1(证书上)]='{7}', [规格/描述2(SAP上)]='{8}', [产品12NC]='{9}'",
+                                insertItem = String.Format("update {0} set [归档号]='{1}', [GroupLeader]='{2}', [证书编号]='{3}', [状态]='{4}', [规格/描述1(证书上)]='{5}', [规格/描述2(SAP上)]='{6}', [产品12NC]='{7}', [Factory]='{8}'",
                                     PRODUCT,
                                     cc.Cells[2].Value.ToString(),
                                     cc.Cells[3].Value.ToString(),
@@ -359,8 +362,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                     cc.Cells[6].Value.ToString(),
                                     cc.Cells[7].Value.ToString(),
                                     cc.Cells[8].Value.ToString(),
-                                    cc.Cells[9].Value.ToString(),
-                                    cc.Cells[10].Value.ToString());
+                                    cc.Cells[9].Value.ToString());
                                 insertItem += String.Format(" WHERE [{0}]={1}", INDEX, cc.Cells[1].Value.ToString());
 
                             }
@@ -727,6 +729,11 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                     this.indicator.Text = "当前最大索引: " + max.ToString();
                     this.indicator.ForeColor = SystemColors.ControlText;
                 }   
+
+                // Caption
+                login logform = (login)f2;
+                this.Text += " / ";
+                this.Text += logform.caption.ToString();
             }
             else
                 this.Close();
@@ -1208,14 +1215,13 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 string[] sheetColumeName = {"序列号",
                                      "归档号",
-                                     "ProductFamily",
                                      "GroupLeader",
                                      "证书编号",
                                      "状态",
-                                     "Factory",
                                      "规格/描述1(证书上)",
                                      "规格/描述2(SAP上)",
-                                     "产品12NC"};
+                                     "产品12NC",
+                                     "Factory"};
 
                 try
                 {
@@ -1250,14 +1256,20 @@ namespace Philips_Lighting_Luminaries_Choicesheet
                                         dt.Columns.Add();
                                 }
 
-                                // Check the sheet format, must be in
-                                //"序列号" "归档号" "Product Family" "Group Leader" "证书编号" "状态" "Factory" "规格/描述1(证书上)" "规格/描述2(SAP上)" "产品12NC"
-                                for(int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
+                                if (worksheet.Cells.CurrentRegion.Columns.Count != sheetColumeName.Length)
+                                    toContinue = false;
+
+                                if (toContinue)
                                 {
-                                    Excel.Range temp = (Excel.Range)worksheet.Cells[1, c];
-                                    string strv = temp.Text.ToString().Replace(" ", "");
-                                    if (strv != string.Empty && sheetColumeName[c - 1] != strv)
-                                        toContinue = false;
+                                    // Check the sheet format, must be in
+                                    //"序列号" "归档号" "Group Leader" "证书编号" "状态" "规格/描述1(证书上)" "规格/描述2(SAP上)" "产品12NC" "Factory"
+                                    for (int c = 1; c <= worksheet.Cells.CurrentRegion.Columns.Count; c++)
+                                    {
+                                        Excel.Range temp = (Excel.Range)worksheet.Cells[1, c];
+                                        string strv = temp.Text.ToString().Replace(" ", "");
+                                        if (strv != string.Empty && sheetColumeName[c - 1] != strv)
+                                            toContinue = false;
+                                    }
                                 }
 
                                 if (toContinue)

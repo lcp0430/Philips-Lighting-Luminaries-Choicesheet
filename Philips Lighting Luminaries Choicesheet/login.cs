@@ -12,6 +12,7 @@ namespace Philips_Lighting_Luminaries_Choicesheet
     public partial class login : Form
     {
         public Form1.userInfo curUser;
+        public String caption;
 
         public login(Form1 f)
         {
@@ -130,6 +131,8 @@ namespace Philips_Lighting_Luminaries_Choicesheet
             {
                 this.Text += " / ";
                 this.Text += temp.ToString();
+
+                this.caption = temp.ToString();
             }
         }
     }
